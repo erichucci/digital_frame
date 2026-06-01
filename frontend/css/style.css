@@ -1,0 +1,126 @@
+/* ============================================
+   Digital Frame - 电子相框 自定义样式
+   适配初代 iPad (1024×768)
+   ============================================ */
+
+/* 基础重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: -apple-system, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 禁止选中和拖拽 */
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* 轮播容器 */
+#slideshow-container {
+  z-index: 0;
+}
+
+#slideshow-image {
+  transition: opacity 1.5s ease-in-out;
+  opacity: 0;
+}
+
+#slideshow-image.active {
+  opacity: 1;
+}
+
+/* 时钟样式 */
+#clock-container {
+  z-index: 10;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+#clock-time {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 4px;
+}
+
+/* 天气样式 */
+#weather-container {
+  z-index: 10;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  max-width: 250px;
+}
+
+/* 版本号 */
+#version-container {
+  z-index: 10;
+}
+
+/* 加载指示器 */
+#loading-indicator {
+  z-index: 100;
+  transition: opacity 0.5s ease;
+}
+
+#loading-indicator.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 天气图标字体回退 */
+.weather-icon {
+  display: inline-block;
+  font-size: 1.2em;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* 针对初代 iPad 的兼容适配 */
+@media screen and (max-width: 1024px) {
+  #clock-time {
+    font-size: 3.5rem !important;
+  }
+  #clock-date {
+    font-size: 1.25rem !important;
+  }
+  #weather-temp {
+    font-size: 2.5rem !important;
+  }
+  #weather-desc {
+    font-size: 1rem !important;
+  }
+}
+
+/* 针对小屏幕的进一步适配 */
+@media screen and (max-width: 768px) {
+  #clock-time {
+    font-size: 2.5rem !important;
+  }
+  #clock-date {
+    font-size: 1rem !important;
+  }
+  #weather-temp {
+    font-size: 2rem !important;
+  }
+}
+
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+  display: none;
+}

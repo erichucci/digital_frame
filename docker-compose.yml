@@ -1,0 +1,71 @@
+# ============================================
+# Digital Frame - Docker Compose 配置
+# 部署到群晖 DS1520+
+# ============================================
+# 使用方法：
+# 1. 在 server/ 目录下创建 .env 文件（参考 .env.example）
+# 2. 修改下方 volumes 中的 NAS照片路径
+# 3. 运行: docker-compose up -d
+# ============================================
+
+version: '3.8'
+
+services:
+  # ============================================
+  # Nginx - 前端静态资源服务 + 反向代理
+  # ============================================
+  nginx:
+    image: nginx:alpine
+    container_name: digital-frame-nginx
+    restart: unless-stopped
+    ports:
+      # 宿主机端口:容器端口（修改左侧端口避免冲突）
+      - "8080:80"
+    volumes:
+      # Nginx 配置
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      # 前端静态文件
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - server
+    networks:
+      - digital-frame-net
+
+  # ============================================
+  # Node.js 后端服务
+  # ============================================
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: digital-frame-server
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      # 服务端口
+      - PORT=3000
+      # 照片目录（容器内路径）
+      - PHOTOS_PATH=/data/photos
+      # 和风天气 API Key（从 .env 文件读取）
+      - QWEATHER_API_KEY=${QWEATHER_API_KEY}
+      # 城市ID
+      - QWEATHER_LOCATION_ID=${QWEATHER_LOCATION_ID:-101010100}
+      # 缓存配置
+      - WEATHER_CACHE_TTL=${WEATHER_CACHE_TTL:-1800000}
+      - PHOTOS_CACHE_TTL=${PHOTOS_CACHE_TTL:-300000}
+    volumes:
+      # ============================================
+      # 【重要】修改此处为你的NAS照片目录路径
+      # 格式: /volume4/photo:/data/photos
+      # 左侧是NAS实际路径，右侧是容器内路径（勿改）
+      # ============================================
+      - /volume4/photo:/data/photos:ro
+    env_file:
+      - ./server/.env
+    networks:
+      - digital-frame-net
+
+networks:
+  digital-frame-net:
+    driver: bridge

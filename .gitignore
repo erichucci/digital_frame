@@ -10,3 +10,9 @@ node_modules/
 
 # VS Code配置
 .vscode/
+
+# Docker 构建缓存
+.docker/
+
+# 日志文件
+*.log
