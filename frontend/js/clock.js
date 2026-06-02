@@ -2,10 +2,11 @@
  * Digital Frame - 时钟模块
  * 显示实时时间（年月日 + 星期 + 时分秒）
  * 使用设备本地时间，断网不受影响
+ * 兼容 iOS 12 及以下（ES5 语法）
  */
 
 // 星期映射
-const WEEKDAY_NAMES = {
+var WEEKDAY_NAMES = {
   'zh-CN': ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
   'en': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
 };
@@ -16,38 +17,34 @@ const WEEKDAY_NAMES = {
  * @returns {string}
  */
 function padZero(num) {
-  return String(num).padStart(2, '0');
+  return num < 10 ? '0' + num : '' + num;
 }
 
 /**
  * 更新时钟显示
  */
 function updateClock() {
-  const now = new Date();
-  const config = window.APP_CONFIG ? window.APP_CONFIG.clock : { locale: 'zh-CN', refreshInterval: 1000 };
-  const locale = config.locale || 'zh-CN';
+  var now = new Date();
+  var config = window.APP_CONFIG ? window.APP_CONFIG.clock : { locale: 'zh-CN', refreshInterval: 1000 };
+  var locale = config.locale || 'zh-CN';
 
   // 格式化时间 HH:mm:ss
-  const timeStr = [
-    padZero(now.getHours()),
-    padZero(now.getMinutes()),
-    padZero(now.getSeconds()),
-  ].join(':');
+  var timeStr = padZero(now.getHours()) + ':' + padZero(now.getMinutes()) + ':' + padZero(now.getSeconds());
 
   // 格式化日期
-  let dateStr;
+  var dateStr;
   if (locale === 'zh-CN') {
-    const weekDay = WEEKDAY_NAMES['zh-CN'][now.getDay()];
-    dateStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${weekDay}`;
+    var weekDay = WEEKDAY_NAMES['zh-CN'][now.getDay()];
+    dateStr = now.getFullYear() + '\u5E74' + (now.getMonth() + 1) + '\u6708' + now.getDate() + '\u65E5 ' + weekDay;
   } else {
-    const weekDay = WEEKDAY_NAMES['en'][now.getDay()];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    dateStr = `${weekDay}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+    var weekDay = WEEKDAY_NAMES['en'][now.getDay()];
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    dateStr = weekDay + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
   }
 
   // 更新DOM
-  const timeEl = document.getElementById('clock-time');
-  const dateEl = document.getElementById('clock-date');
+  var timeEl = document.getElementById('clock-time');
+  var dateEl = document.getElementById('clock-date');
 
   if (timeEl) timeEl.textContent = timeStr;
   if (dateEl) dateEl.textContent = dateStr;
@@ -62,10 +59,8 @@ function initClock() {
   updateClock();
 
   // 设置定时器
-  const config = window.APP_CONFIG ? window.APP_CONFIG.clock : { refreshInterval: 1000 };
+  var config = window.APP_CONFIG ? window.APP_CONFIG.clock : { refreshInterval: 1000 };
   setInterval(updateClock, config.refreshInterval || 1000);
-
-  console.log('[Clock] 时钟已启动');
 }
 
 // 导出到全局

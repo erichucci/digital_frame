@@ -6,15 +6,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Digital Frame - 电子相框</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 自定义样式 -->
+  <!-- 自定义样式（不依赖 Tailwind，兼容 iOS 12） -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="m-0 p-0 overflow-hidden bg-black w-screen h-screen">
+<body>
   <!-- 轮播背景 -->
-  <div id="slideshow-container" class="absolute inset-0 w-full h-full">
-    <img id="slideshow-image" class="absolute inset-0 w-full h-full object-cover" alt="slideshow">
+  <div id="slideshow-container">
+    <div id="slideshow-image" alt="slideshow"></div>
     <!-- 上一张按钮 -->
     <button id="btn-prev" class="nav-btn nav-btn-left" onclick="handleManualPrev()" aria-label="上一张">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -30,29 +28,29 @@
   </div>
 
   <!-- 遮罩层 - 提升文字可读性 -->
-  <div class="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20 pointer-events-none"></div>
+  <div id="overlay"></div>
 
-  <!-- 时钟组件 - 左上角 -->
-  <div id="clock-container" class="absolute top-6 left-6 text-white select-none">
-    <div id="clock-time" class="text-7xl font-bold tracking-wider drop-shadow-lg">00:00:00</div>
-    <div id="clock-date" class="text-2xl mt-2 font-light tracking-wide drop-shadow-md">----年--月--日 星期-</div>
+  <!-- 时钟组件 - 右上角 -->
+  <div id="clock-container">
+    <div id="clock-time">00:00:00</div>
+    <div id="clock-date">----年--月--日 星期-</div>
   </div>
 
-  <!-- 天气组件 - 右上角 -->
-  <div id="weather-container" class="absolute top-6 right-6 text-white text-right select-none hidden">
-    <div id="weather-temp" class="text-5xl font-bold drop-shadow-lg">--°C</div>
-    <div id="weather-desc" class="text-xl mt-1 font-light drop-shadow-md">--</div>
-    <div id="weather-wind" class="text-base mt-1 opacity-80 drop-shadow-sm">--</div>
+  <!-- 天气组件 - 左下角 -->
+  <div id="weather-container" class="hidden">
+    <div id="weather-temp">--°C</div>
+    <div id="weather-desc">--</div>
+    <div id="weather-wind">--</div>
   </div>
 
   <!-- 版本号 - 右下角（从后端 API 动态获取） -->
-  <div id="version-container" class="absolute bottom-4 right-4 text-white/40 text-sm font-light select-none">
+  <div id="version-container">
     Ver:<span id="version-text">--</span>
   </div>
 
   <!-- 加载提示 -->
-  <div id="loading-indicator" class="absolute inset-0 flex items-center justify-center bg-black">
-    <div class="text-white/60 text-lg animate-pulse">加载中...</div>
+  <div id="loading-indicator">
+    <div id="loading-text">加载中...</div>
   </div>
 
   <!-- JavaScript 模块 -->
@@ -63,14 +61,17 @@
   <script>
     // 从后端获取版本号
     function fetchVersion() {
-      fetch('/api/health')
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          document.getElementById('version-text').textContent = 'v' + data.version;
-        })
-        .catch(function() {
-          // 静默失败，保留默认显示
-        });
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/health', true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          try {
+            var data = JSON.parse(xhr.responseText);
+            document.getElementById('version-text').textContent = 'v' + data.version;
+          } catch(e) {}
+        }
+      };
+      xhr.send();
     }
 
     // 应用启动
@@ -85,7 +86,11 @@
       initSlideshow();
       // 隐藏加载提示
       setTimeout(function() {
-        document.getElementById('loading-indicator').classList.add('hidden');
+        var el = document.getElementById('loading-indicator');
+        if (el) {
+          el.className = el.className.replace(/\bhidden\b/g, '').trim();
+          el.className += ' hidden';
+        }
       }, 500);
     });
   </script>
