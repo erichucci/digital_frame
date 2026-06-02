@@ -18,11 +18,13 @@ let photosCache = {
 };
 
 /**
- * 扫描照片目录，获取图片文件列表
- * @returns {string[]} 图片文件名数组（按文件名排序）
+ * 递归扫描照片目录，获取所有图片文件列表
+ * @param {string} dir - 要扫描的目录路径
+ * @param {string} [relativePath=''] - 相对路径前缀
+ * @returns {string[]} 图片文件相对路径数组（按路径排序）
  */
-function scanPhotos() {
-  const photosDir = config.photosPath;
+function scanPhotos(dir, relativePath = '') {
+  const photosDir = dir || config.photosPath;
 
   // 检查目录是否存在
   if (!fs.existsSync(photosDir)) {
@@ -30,16 +32,30 @@ function scanPhotos() {
     return [];
   }
 
-  // 读取目录
-  const files = fs.readdirSync(photosDir);
+  let photos = [];
 
-  // 过滤出图片文件，按文件名排序
-  const photos = files
-    .filter(file => {
-      const ext = path.extname(file).toLowerCase();
-      return config.allowedExtensions.includes(ext);
-    })
-    .sort((a, b) => a.localeCompare(b, 'zh-CN', { numeric: true }));
+  // 读取目录内容
+  const entries = fs.readdirSync(photosDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(photosDir, entry.name);
+    const relPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+
+    if (entry.isDirectory()) {
+      // 递归扫描子目录
+      const subPhotos = scanPhotos(fullPath, relPath);
+      photos = photos.concat(subPhotos);
+    } else if (entry.isFile()) {
+      // 检查是否为允许的图片格式
+      const ext = path.extname(entry.name).toLowerCase();
+      if (config.allowedExtensions.includes(ext)) {
+        photos.push(relPath);
+      }
+    }
+  }
+
+  // 按路径排序
+  photos.sort((a, b) => a.localeCompare(b, 'zh-CN', { numeric: true }));
 
   return photos;
 }
@@ -92,12 +108,12 @@ router.get('/', (req, res) => {
 });
 
 /**
- * GET /api/photos/:filename
- * 返回指定图片文件
+ * GET /api/photos/:path(*)
+ * 返回指定图片文件（支持子目录路径）
  */
-router.get('/:filename', (req, res) => {
+router.get('/:path(*)', (req, res) => {
   try {
-    const filename = decodeURIComponent(req.params.filename);
+    const filename = decodeURIComponent(req.params.path);
     const filePath = path.join(config.photosPath, filename);
 
     // 安全检查：防止路径穿越
