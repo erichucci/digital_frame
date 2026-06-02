@@ -24,8 +24,11 @@ const config = {
   weather: {
     // API Key（必填，从环境变量获取）
     apiKey: process.env.QWEATHER_API_KEY || '',
-    // API 基础地址
-    baseUrl: 'https://devapi.qweather.com/v7',
+    // API 基础地址（和风天气给每个用户分配专属域名）
+    // 从环境变量读取，默认使用通用域名
+    baseUrl: process.env.QWEATHER_API_HOST 
+      ? `https://${process.env.QWEATHER_API_HOST}/v7`
+      : 'https://devapi.qweather.com/v7',
     // 城市ID（默认北京，可在 .env 中修改）
     locationId: process.env.QWEATHER_LOCATION_ID || '101010100',
     // 请求超时时间（毫秒）
