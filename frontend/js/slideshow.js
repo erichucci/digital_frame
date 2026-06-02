@@ -90,23 +90,11 @@ function switchToImage(index) {
   // 移除 active 类（触发淡出）
   imgEl.className = imgEl.className.replace(/\bactive\b/g, '').trim();
 
-  // 使用 Image 对象预加载当前图片（div 元素没有 onload 事件）
-  var loader = new Image();
-  loader.onload = function() {
-    // 加载完成后设置 backgroundImage 并显示
-    imgEl.style.backgroundImage = 'url(' + url + ')';
-    imgEl.className = imgEl.className.trim();
-    imgEl.className += ' active';
-  };
-  loader.onerror = function() {
-    // 加载失败时尝试下一张
-    slideshowState.retryCount++;
-    var maxRetries = window.APP_CONFIG ? window.APP_CONFIG.slideshow.maxRetries : 3;
-    if (slideshowState.retryCount < maxRetries) {
-      setTimeout(function() { nextPhoto(); }, 2000);
-    }
-  };
-  loader.src = url;
+  // 直接设置 backgroundImage，不依赖 Image 对象的 onload 事件
+  // 原因：iOS 12 Safari 中局部 Image 变量可能被 GC 回收导致 onload 不触发
+  imgEl.style.backgroundImage = 'url(' + url + ')';
+  imgEl.className = imgEl.className.trim();
+  imgEl.className += ' active';
 }
 
 /**
