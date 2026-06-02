@@ -63,6 +63,9 @@ function switchToImage(index) {
   const url = slideshowState.photos[index];
   if (!url) return;
 
+  // 立即更新当前索引（修复：之前放在 onload 中导致快速点击时索引不更新）
+  slideshowState.currentIndex = index;
+
   // 预加载下一张
   const nextIndex = (index + 1) % slideshowState.photos.length;
   if (slideshowState.photos[nextIndex]) {
@@ -76,7 +79,6 @@ function switchToImage(index) {
   // 图片加载完成后显示
   imgEl.onload = () => {
     imgEl.classList.add('active');
-    slideshowState.currentIndex = index;
   };
 
   imgEl.onerror = () => {
