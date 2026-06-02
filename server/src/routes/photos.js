@@ -38,6 +38,11 @@ function scanPhotos(dir, relativePath = '') {
   const entries = fs.readdirSync(photosDir, { withFileTypes: true });
 
   for (const entry of entries) {
+    // 跳过群晖 DSM 自动生成的缩略图目录
+    if (entry.name === '@eaDir' || entry.name === '#recycle') {
+      continue;
+    }
+
     const fullPath = path.join(photosDir, entry.name);
     const relPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
 
