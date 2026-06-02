@@ -15,6 +15,18 @@
   <!-- 轮播背景 -->
   <div id="slideshow-container" class="absolute inset-0 w-full h-full">
     <img id="slideshow-image" class="absolute inset-0 w-full h-full object-cover" alt="slideshow">
+    <!-- 上一张按钮 -->
+    <button id="btn-prev" class="nav-btn nav-btn-left" onclick="handleManualPrev()" aria-label="上一张">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <!-- 下一张按钮 -->
+    <button id="btn-next" class="nav-btn nav-btn-right" onclick="handleManualNext()" aria-label="下一张">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
   </div>
 
   <!-- 遮罩层 - 提升文字可读性 -->

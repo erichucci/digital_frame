@@ -180,8 +180,46 @@ function setSlideshowPaused(paused) {
   slideshowState.isPaused = paused;
 }
 
+/**
+ * 手动切换 - 上一张（暂停自动轮播10秒）
+ */
+function handleManualPrev() {
+  if (slideshowState.photos.length === 0) return;
+  prevPhoto();
+  pauseAutoPlay(10000);
+}
+
+/**
+ * 手动切换 - 下一张（暂停自动轮播10秒）
+ */
+function handleManualNext() {
+  if (slideshowState.photos.length === 0) return;
+  nextPhoto();
+  pauseAutoPlay(10000);
+}
+
+/**
+ * 暂停自动轮播指定时间后恢复
+ * @param {number} duration - 暂停时长（毫秒）
+ */
+function pauseAutoPlay(duration) {
+  // 清除之前的暂停定时器
+  if (slideshowState.pauseTimerId) {
+    clearTimeout(slideshowState.pauseTimerId);
+  }
+  // 暂停自动轮播
+  slideshowState.isPaused = true;
+  // 设定时间后恢复
+  slideshowState.pauseTimerId = setTimeout(() => {
+    slideshowState.isPaused = false;
+    slideshowState.pauseTimerId = null;
+  }, duration);
+}
+
 // 导出到全局
 window.initSlideshow = initSlideshow;
 window.nextPhoto = nextPhoto;
 window.prevPhoto = prevPhoto;
 window.setSlideshowPaused = setSlideshowPaused;
+window.handleManualPrev = handleManualPrev;
+window.handleManualNext = handleManualNext;
