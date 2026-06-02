@@ -50,6 +50,8 @@ services:
       - PORT=3000
       # 照片目录（容器内路径）
       - PHOTOS_PATH=/data/photos
+      # 应用版本号（从项目根目录 VERSION 文件读取）
+      - APP_VERSION=${APP_VERSION:-0.2.0}
     volumes:
       # ============================================
       # 【重要】修改此处为你的NAS照片目录路径

@@ -13,13 +13,17 @@ const weatherRouter = require('./routes/weather');
 
 const app = express();
 
-// 从 VERSION 文件读取版本号
-const versionPath = path.join(__dirname, '../../VERSION');
-let appVersion = '0.1.0';
-try {
-  appVersion = fs.readFileSync(versionPath, 'utf-8').trim().replace(/^v/, '');
-} catch (e) {
-  console.warn(`[Server] 无法读取 VERSION 文件: ${versionPath}`);
+// 获取应用版本号
+// 优先级: 环境变量 APP_VERSION > VERSION 文件 > 默认值
+let appVersion = process.env.APP_VERSION || '';
+if (!appVersion) {
+  const versionPath = path.join(__dirname, '../../VERSION');
+  try {
+    appVersion = fs.readFileSync(versionPath, 'utf-8').trim().replace(/^v/, '');
+  } catch (e) {
+    appVersion = '0.1.0';
+    console.warn(`[Server] 无法读取 VERSION 文件，使用默认版本: ${appVersion}`);
+  }
 }
 
 // ============================================
