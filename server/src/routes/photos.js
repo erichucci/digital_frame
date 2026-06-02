@@ -91,8 +91,12 @@ router.get('/', (req, res) => {
   try {
     const photos = getPhotoList();
 
-    // 返回图片URL列表（相对路径，前端通过Nginx或直接访问）
-    const photoUrls = photos.map(filename => `/api/photos/${encodeURIComponent(filename)}`);
+    // 返回图片URL列表
+    // 注意：对路径的每部分单独编码，避免将 / 编码为 %2F
+    const photoUrls = photos.map(filename => {
+      const parts = filename.split('/').map(part => encodeURIComponent(part));
+      return `/api/photos/${parts.join('/')}`;
+    });
 
     res.json({
       total: photos.length,
