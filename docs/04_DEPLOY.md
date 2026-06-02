@@ -41,6 +41,11 @@ cp .env.example .env
 # 和风天气 API Key（必填）
 QWEATHER_API_KEY=你申请的API_KEY
 
+# API 专属域名（必填，和风天气给每个用户分配的唯一域名）
+# 登录和风天气控制台 → 应用管理 → 你的应用 → 查看「API域名」
+# 形如：xxxxxx.re.qweatherapi.com
+QWEATHER_API_HOST=你的专属域名
+
 # 你所在城市的 Location ID
 QWEATHER_LOCATION_ID=101010100
 ```
@@ -87,7 +92,10 @@ volumes:
    ```bash
    cp server/.env.example server/.env
    vi server/.env
-   # 填入 QWEATHER_API_KEY 和 QWEATHER_LOCATION_ID
+   # 填入以下三项：
+   #   QWEATHER_API_KEY     - 和风天气 API Key
+   #   QWEATHER_API_HOST    - 专属 API 域名（形如 xxxxxx.re.qweatherapi.com）
+   #   QWEATHER_LOCATION_ID - 你所在城市的 Location ID
    ```
 5. 修改照片目录路径（编辑 `docker-compose.yml`）：
    ```bash
@@ -131,7 +139,10 @@ cd digital_frame
 # 创建 .env 文件
 cp server/.env.example server/.env
 vi server/.env
-# 填入 QWEATHER_API_KEY 和 QWEATHER_LOCATION_ID
+# 填入以下三项：
+#   QWEATHER_API_KEY     - 和风天气 API Key
+#   QWEATHER_API_HOST    - 专属 API 域名（形如 xxxxxx.re.qweatherapi.com）
+#   QWEATHER_LOCATION_ID - 你所在城市的 Location ID
 
 # 修改照片目录路径
 vi docker-compose.yml
