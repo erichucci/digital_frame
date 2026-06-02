@@ -6,7 +6,61 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Digital Frame - 电子相框</title>
-  <!-- 自定义样式（不依赖 Tailwind，兼容 iOS 12） -->
+  <!-- 关键样式内联（确保 iOS 12 能正确显示） -->
+  <style>
+    /* 基础重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: -apple-system, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif; }
+
+    /* 轮播容器 */
+    #slideshow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background: #000; }
+    #slideshow-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; background-repeat: no-repeat; -webkit-transition: opacity 1.5s ease-in-out; transition: opacity 1.5s ease-in-out; opacity: 0; }
+    #slideshow-image.active { opacity: 1; }
+
+    /* 时钟 - 右上角 */
+    #clock-container { position: fixed; top: 30px; right: 40px; z-index: 10; text-align: right; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); pointer-events: none; }
+    #clock-time { font-size: 4rem; font-weight: 200; letter-spacing: 4px; line-height: 1.1; }
+    #clock-date { font-size: 1.4rem; font-weight: 300; opacity: 0.85; margin-top: 4px; }
+
+    /* 天气 - 左下角 */
+    #weather-container { position: fixed; bottom: 40px; left: 40px; z-index: 10; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.5); max-width: 280px; }
+    #weather-temp { font-size: 3rem; font-weight: 200; line-height: 1.1; }
+    #weather-desc { font-size: 1.2rem; font-weight: 300; opacity: 0.9; margin-top: 4px; }
+    #weather-wind { font-size: 0.9rem; font-weight: 300; opacity: 0.7; margin-top: 2px; }
+
+    /* 版本号 - 右下角 */
+    #version-container { position: fixed; bottom: 40px; right: 40px; z-index: 10; color: rgba(255,255,255,0.5); font-size: 0.85rem; font-weight: 300; text-shadow: 0 1px 5px rgba(0,0,0,0.5); pointer-events: none; }
+
+    /* 遮罩层 */
+    #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; background: -webkit-linear-gradient(top, rgba(0,0,0,0.2) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.3) 100%); background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.3) 100%); }
+
+    /* 加载提示 */
+    #loading-indicator { position: fixed; top: 50%; left: 50%; z-index: 100; -webkit-transform: translate(-50%,-50%); transform: translate(-50%,-50%); color: rgba(255,255,255,0.6); font-size: 1rem; }
+    #loading-indicator.hidden { opacity: 0; pointer-events: none; }
+
+    /* 导航按钮 */
+    .nav-btn { position: fixed; top: 50%; z-index: 20; width: 60px; height: 80px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center; background: rgba(0,0,0,0.3); border: none; cursor: pointer; color: rgba(255,255,255,0.6); -webkit-transition: all 0.3s ease; transition: all 0.3s ease; opacity: 0; -webkit-tap-highlight-color: transparent; outline: none; -webkit-transform: translateY(-50%); transform: translateY(-50%); }
+    .nav-btn svg { width: 32px; height: 32px; }
+    .nav-btn-left { left: 0; border-radius: 0 8px 8px 0; }
+    .nav-btn-right { right: 0; border-radius: 8px 0 0 8px; }
+    .nav-btn:active, .nav-btn:focus { opacity: 1; background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.9); }
+    @media (hover: none) and (pointer: coarse) { .nav-btn { opacity: 0.6; } }
+
+    /* 隐藏 */
+    .hidden { display: none !important; }
+
+    /* 淡入动画 */
+    @-webkit-keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { -webkit-animation: fadeIn 1s ease-in-out; animation: fadeIn 1s ease-in-out; }
+
+    /* JS 错误显示 */
+    #js-error { position: fixed; top: 50%; left: 50%; z-index: 200; max-width: 90%; -webkit-transform: translate(-50%,-50%); transform: translate(-50%,-50%); background: rgba(200,0,0,0.8); color: #fff; padding: 20px; border-radius: 8px; font-size: 14px; text-align: center; word-break: break-all; }
+
+    /* iPad 适配 */
+    @media screen and (max-width: 1024px) { #clock-time { font-size: 3.5rem !important; } #clock-date { font-size: 1.25rem !important; } #weather-temp { font-size: 2.5rem !important; } #weather-desc { font-size: 1rem !important; } }
+  </style>
+  <!-- 外部样式（补充非关键样式） -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
