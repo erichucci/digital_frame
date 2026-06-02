@@ -16,3 +16,6 @@ node_modules/
 
 # 日志文件
 *.log
+
+# 测试图片目录
+test_photos/

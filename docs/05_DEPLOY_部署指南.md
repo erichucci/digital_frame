@@ -109,7 +109,7 @@ volumes:
 1. 在浏览器中访问：`http://群晖IP:8080`
 2. 应该能看到电子相框页面
 3. 检查 API 是否正常：`http://群晖IP:8080/api/health`
-   - 应返回 JSON：`{"status":"ok","version":"0.1.0",...}`
+   - 应返回 JSON：`{"status":"ok","version":"0.2.0",...}`
 
 ---
 
