@@ -78,7 +78,7 @@ function switchToImage(index) {
   var url = slideshowState.photos[index];
   if (!url) return;
 
-  // 立即更新当前索引（修复：之前放在 onload 中导致快速点击时索引不更新）
+  // 立即更新当前索引
   slideshowState.currentIndex = index;
 
   // 预加载下一张
@@ -87,17 +87,18 @@ function switchToImage(index) {
     preloadImage(slideshowState.photos[nextIndex], function() {});
   }
 
-  // 切换图片（使用 background-image 方案，兼容 iOS 12 不支持 object-fit）
+  // 移除 active 类（触发淡出）
   imgEl.className = imgEl.className.replace(/\bactive\b/g, '').trim();
-  imgEl.style.backgroundImage = 'url(' + url + ')';
 
-  // 图片加载完成后显示
-  imgEl.onload = function() {
+  // 使用 Image 对象预加载当前图片（div 元素没有 onload 事件）
+  var loader = new Image();
+  loader.onload = function() {
+    // 加载完成后设置 backgroundImage 并显示
+    imgEl.style.backgroundImage = 'url(' + url + ')';
     imgEl.className = imgEl.className.trim();
     imgEl.className += ' active';
   };
-
-  imgEl.onerror = function() {
+  loader.onerror = function() {
     // 加载失败时尝试下一张
     slideshowState.retryCount++;
     var maxRetries = window.APP_CONFIG ? window.APP_CONFIG.slideshow.maxRetries : 3;
@@ -105,6 +106,7 @@ function switchToImage(index) {
       setTimeout(function() { nextPhoto(); }, 2000);
     }
   };
+  loader.src = url;
 }
 
 /**
