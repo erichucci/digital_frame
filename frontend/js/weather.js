@@ -148,6 +148,7 @@ function updateWeather() {
 /**
  * 初始化天气模块
  * 首次立即获取，之后按配置间隔刷新
+ * 点击天气区域可手动刷新
  */
 function initWeather() {
   // 立即获取一次天气
@@ -156,6 +157,16 @@ function initWeather() {
   // 设置定时刷新
   var config = window.APP_CONFIG ? window.APP_CONFIG.weather : { refreshInterval: 30 * 60 * 1000 };
   weatherState.timerId = setInterval(updateWeather, config.refreshInterval);
+
+  // 点击天气容器手动刷新
+  var container = document.getElementById('weather-container');
+  if (container) {
+    container.style.cursor = 'pointer';
+    container.style.pointerEvents = 'auto';
+    container.addEventListener('click', function() {
+      updateWeather();
+    });
+  }
 }
 
 // 导出到全局
