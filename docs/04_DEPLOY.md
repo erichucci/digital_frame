@@ -159,6 +159,65 @@ docker-compose up -d
 
 ---
 
+## 四、同步更新项目
+
+当你在 Mac 上修改了代码并推送到 GitHub 后，需要在群晖上拉取最新代码并重启服务。
+
+### 4.1 通过 git pull 更新（推荐）
+
+```bash
+# SSH 连接到群晖
+ssh 你的用户名@群晖IP
+
+# 进入项目目录
+cd /volume1/docker/digital_frame
+
+# 拉取最新代码
+git pull origin main
+
+# 重新构建并启动容器（如果代码有变化）
+docker-compose down
+docker-compose up -d --build
+```
+
+> **注意**：`docker-compose up -d --build` 会重新构建镜像，
+> 如果只改了前端文件（HTML/CSS/JS），也可以只重启 Nginx 容器：
+> ```bash
+> docker-compose restart nginx
+> ```
+
+### 4.2 通过 tar 包更新（如果之前是用 tar 部署的）
+
+```bash
+# 在 Mac 上重新打包
+cd /Users/erich/loseric
+tar czf digital_frame.tar.gz digital_frame
+
+# 上传到群晖后，在群晖上解压覆盖
+cd /volume1/docker
+tar xzf digital_frame.tar.gz
+cd digital_frame
+
+# 重启服务
+docker-compose down
+docker-compose up -d --build
+```
+
+### 4.3 更新后验证
+
+```bash
+# 查看容器状态
+docker-compose ps
+
+# 查看启动日志
+docker-compose logs --tail=20
+
+# 检查 API
+curl http://localhost:8080/api/health
+```
+
+---
+
 ## 附：本地开发测试（Mac/Linux）
 
 如果你在 Mac 上开发，也可以先在本地测试：
@@ -181,16 +240,16 @@ open http://localhost:3000
 
 ---
 
-## 四、iPad 访问设置
+## 五、iPad 访问设置
 
-### 4.1 获取访问地址
+### 5.1 获取访问地址
 
 1. 在群晖上查看 IP 地址：
    - 控制面板 → 网络 → 网络界面
    - 记录 LAN 口的 IP（如 `192.168.1.100`）
 2. 访问地址：`http://192.168.1.100:8080`
 
-### 4.2 在 iPad 上设置
+### 5.2 在 iPad 上设置
 
 1. 打开 Safari 浏览器
 2. 访问 `http://192.168.1.100:8080`
@@ -198,28 +257,28 @@ open http://localhost:3000
 4. 命名为「电子相框」
 5. 从主屏幕打开，即可全屏运行
 
-### 4.3 设置常亮显示
+### 5.3 设置常亮显示
 
 在 iPad 的 **设置 → 显示与亮度 → 自动锁定** 中，选择「永不」
 
 ---
 
-## 五、常见问题
+## 六、常见问题
 
-### 5.1 天气不显示
+### 6.1 天气不显示
 
 - 检查 `.env` 文件中 `QWEATHER_API_KEY` 是否正确配置
 - 检查网络是否正常
 - 查看后端日志：`docker logs digital-frame-server`
 
-### 5.2 图片不显示
+### 6.2 图片不显示
 
 - 确认 NAS 照片目录路径是否正确
 - 确认目录中有 jpg/png 格式的图片
 - 检查目录权限：`ls -la /volume4/photo`
 - 查看后端日志：`docker logs digital-frame-server`
 
-### 5.3 如何修改轮播间隔
+### 6.3 如何修改轮播间隔
 
 编辑 `frontend/js/config.js` 中的 `slideshow.interval` 值（单位毫秒）：
 ```javascript
@@ -229,7 +288,7 @@ slideshow: {
 ```
 修改后需要重启 Nginx 容器（或清除浏览器缓存）。
 
-### 5.4 如何重启服务
+### 6.4 如何重启服务
 
 ```bash
 # 进入项目目录
@@ -243,7 +302,7 @@ docker-compose down
 docker-compose up -d
 ```
 
-### 5.5 如何查看日志
+### 6.5 如何查看日志
 
 ```bash
 # 查看后端日志
@@ -255,7 +314,7 @@ docker logs -f digital-frame-nginx
 
 ---
 
-## 六、端口说明
+## 八、端口说明
 
 | 服务 | 容器内端口 | 宿主机端口 | 说明 |
 |------|-----------|-----------|------|
@@ -270,7 +329,7 @@ ports:
 
 ---
 
-## 七、项目文件结构
+## 九、项目文件结构
 
 ```
 digital_frame/
