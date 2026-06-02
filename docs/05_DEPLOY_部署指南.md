@@ -64,38 +64,84 @@ volumes:
 
 ## 三、部署到群晖
 
-### 方法一：通过群晖 Docker 套件（推荐）
+### 方法一：通过 git clone 部署（推荐）
 
-#### 3.1 上传项目文件
+> **为什么推荐这个方法？**
+> 项目中的 `.env`、`.env.example`、`.gitignore` 等文件以 `.` 开头，在 macOS Finder 和群晖 File Station 中默认**隐藏不显示**。
+> 用 `git clone` 可以确保所有文件（包括隐藏文件）完整无误地拷贝到 NAS 上。
 
-1. 打开群晖的 **File Station**
-2. 在 `docker` 共享文件夹下创建 `digital_frame` 目录
-3. 将整个项目文件夹上传到该目录
-4. 最终路径如：`/docker/digital_frame/`
-
-#### 3.2 配置 .env 文件
-
-在 `server/` 目录下创建 `.env` 文件（参考上面的配置步骤）
-
-#### 3.3 使用 Docker Compose 部署
-
-**方式 A：通过 SSH 命令行**
+#### 3.1 在群晖上通过 SSH 拉取代码
 
 1. 群晖开启 SSH（控制面板 → 终端机和 SNMP → 启动 SSH）
 2. 使用 SSH 连接到群晖：
    ```bash
    ssh 你的用户名@群晖IP地址
    ```
-3. 进入项目目录：
+3. 拉取代码：
    ```bash
-   cd /volume1/docker/digital_frame
+   cd /volume1/docker
+   git clone https://github.com/erichucci/digital_frame.git
+   cd digital_frame
    ```
-4. 启动服务：
+4. 配置 `.env` 文件：
+   ```bash
+   cp server/.env.example server/.env
+   vi server/.env
+   # 填入 QWEATHER_API_KEY 和 QWEATHER_LOCATION_ID
+   ```
+5. 修改照片目录路径（编辑 `docker-compose.yml`）：
+   ```bash
+   vi docker-compose.yml
+   # 将 /volume4/photo 改为你 NAS 上的实际照片路径
+   ```
+6. 启动服务：
    ```bash
    docker-compose up -d
    ```
 
-**方式 B：通过群晖的 Docker 套件**
+### 方法二：通过 File Station 手动上传
+
+> ⚠️ **注意**：`.env` 和 `.env.example` 是隐藏文件（以 `.` 开头），
+> 在 macOS Finder 中按 `Cmd + Shift + .` 才能看到，在群晖 File Station 中需开启「显示隐藏文件」。
+> **建议用下面的 tar 打包方式，避免遗漏隐藏文件。**
+
+#### 3.2a 在 Mac 上打包（推荐，保留隐藏文件）
+
+```bash
+# 在 Mac 上打包整个项目（tar 会包含所有隐藏文件）
+cd /Users/erich/loseric
+tar czf digital_frame.tar.gz digital_frame
+
+# 然后通过 File Station 将 digital_frame.tar.gz 上传到群晖的 /docker/ 目录
+```
+
+#### 3.2b 在群晖上解压
+
+通过 SSH 连接到群晖后执行：
+
+```bash
+cd /volume1/docker
+tar xzf digital_frame.tar.gz
+cd digital_frame
+```
+
+#### 3.2c 配置并启动
+
+```bash
+# 创建 .env 文件
+cp server/.env.example server/.env
+vi server/.env
+# 填入 QWEATHER_API_KEY 和 QWEATHER_LOCATION_ID
+
+# 修改照片目录路径
+vi docker-compose.yml
+# 将 /volume4/photo 改为你 NAS 上的实际照片路径
+
+# 启动服务
+docker-compose up -d
+```
+
+### 方法三：通过群晖 Docker 套件（图形界面）
 
 1. 打开 **Docker** 套件
 2. 进入 **项目** 标签页
@@ -113,7 +159,7 @@ volumes:
 
 ---
 
-### 方法二：通过命令行部署（Mac/Linux）
+## 附：本地开发测试（Mac/Linux）
 
 如果你在 Mac 上开发，也可以先在本地测试：
 
