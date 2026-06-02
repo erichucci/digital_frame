@@ -6,11 +6,21 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const config = require('./config');
 const photosRouter = require('./routes/photos');
 const weatherRouter = require('./routes/weather');
 
 const app = express();
+
+// 从 VERSION 文件读取版本号
+const versionPath = path.join(__dirname, '../../VERSION');
+let appVersion = '0.1.0';
+try {
+  appVersion = fs.readFileSync(versionPath, 'utf-8').trim().replace(/^v/, '');
+} catch (e) {
+  console.warn(`[Server] 无法读取 VERSION 文件: ${versionPath}`);
+}
 
 // ============================================
 // 中间件
@@ -57,7 +67,7 @@ app.use('/api/weather', weatherRouter);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    version: '0.1.0',
+    version: appVersion,
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
   });
@@ -93,7 +103,7 @@ app.use((err, req, res, next) => {
 app.listen(config.port, () => {
   console.log('========================================');
   console.log('  Digital Frame 后端服务');
-  console.log(`  版本: 0.1.0`);
+  console.log(`  版本: ${appVersion}`);
   console.log(`  端口: ${config.port}`);
   console.log(`  照片目录: ${config.photosPath}`);
   console.log(`  天气城市ID: ${config.weather.locationId}`);

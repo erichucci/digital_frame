@@ -45,9 +45,9 @@
     <div id="weather-wind" class="text-base mt-1 opacity-80 drop-shadow-sm">--</div>
   </div>
 
-  <!-- 版本号 - 右下角 -->
+  <!-- 版本号 - 右下角（从后端 API 动态获取） -->
   <div id="version-container" class="absolute bottom-4 right-4 text-white/40 text-sm font-light select-none">
-    Ver:<span id="version-text">v0.1.0</span>
+    Ver:<span id="version-text">--</span>
   </div>
 
   <!-- 加载提示 -->
@@ -61,8 +61,22 @@
   <script src="js/weather.js"></script>
   <script src="js/slideshow.js"></script>
   <script>
+    // 从后端获取版本号
+    function fetchVersion() {
+      fetch('/api/health')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          document.getElementById('version-text').textContent = 'v' + data.version;
+        })
+        .catch(function() {
+          // 静默失败，保留默认显示
+        });
+    }
+
     // 应用启动
     document.addEventListener('DOMContentLoaded', function() {
+      // 获取版本号
+      fetchVersion();
       // 初始化时钟
       initClock();
       // 初始化天气
