@@ -53,6 +53,19 @@
     <div id="loading-text">加载中...</div>
   </div>
 
+  <!-- JS 错误显示（调试用） -->
+  <div id="js-error" class="hidden"></div>
+
+  <!-- 全局错误捕获（用于调试兼容性问题） -->
+  <script>
+    window.onerror = function(msg, url, line, col, error) {
+      var errEl = document.getElementById('js-error');
+      if (errEl) {
+        errEl.textContent = msg + ' (at ' + url + ':' + line + ')';
+        errEl.className = errEl.className.replace(/\bhidden\b/g, '').trim();
+      }
+    };
+  </script>
   <!-- JavaScript 模块 -->
   <script src="js/config.js"></script>
   <script src="js/clock.js"></script>
