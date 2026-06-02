@@ -107,6 +107,18 @@ volumes:
    docker-compose up -d
    ```
 
+> **⚠️ 如果遇到 `permission denied` 错误**，说明当前用户没有 Docker 权限：
+> ```bash
+> # 将当前用户加入 docker 用户组
+> sudo synogroup --add docker 你的用户名
+> # 重新登录 SSH 后生效
+> exit
+> ssh 你的用户名@群晖IP
+> # 再次尝试
+> cd /volume1/docker/digital_frame
+> docker-compose up -d
+> ```
+
 ### 方法二：通过 File Station 手动上传
 
 > ⚠️ **注意**：`.env` 和 `.env.example` 是隐藏文件（以 `.` 开头），
